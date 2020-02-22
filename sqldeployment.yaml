@@ -1,0 +1,44 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mssql
+  namespace: default
+  selfLink: "/apis/apps/v1/namespaces/default/deployments/mssql"
+  labels:
+    run: mssql
+  annotations:
+    deployment.kubernetes.io/revision: '1'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: mssql
+  template:
+    metadata:
+      creationTimestamp: 
+      labels:
+        run: mssql
+    spec:
+      containers:
+      - name: mssql
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        resources: {}
+        terminationMessagePath: "/dev/termination-log"
+        terminationMessagePolicy: File
+        imagePullPolicy: IfNotPresent
+      env:
+      - name: MSSQL_PID
+        value: Developer
+      - name: ACCEPT_EULA
+        value: Y
+      - name: MSSQL_SA_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: mssql
+            key: SA_PASSWORD
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
